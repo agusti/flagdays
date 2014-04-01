@@ -48,24 +48,24 @@ def special_days(year):
         father_day = str(third_week[calendar.SUNDAY]) + '/11'
     return {'Mother\'s day' : mother_day, 'Memorial\'s day' : memorial_day, 'Midsummer day' : midsummer_day, 'Father\'s day' : father_day}
 
-def generate_json(years):
+def generate_json(years, output="years.json"):
     """ Generates the JSON for the specified years """
     for year in years:
         special = special_days(year)
         DAYS.update(special)
-        print json.dumps(DAYS)
+        with open(output, 'w') as outfile:
+            json.dump(DAYS, outfile)
 
-    return
 def main():
     """ Parse the arguments and generate the json """
     parser = argparse.ArgumentParser(description='Generate JSON of the Finnish flag days for specific year(s)')
     parser.add_argument('--years', '-y', nargs='*', help='Specify the years', type=int, choices=range(1970, 2100), required=True)
     parser.add_argument('--output', '-o', nargs='?', help='Specify the output file')
-    years_json = generate_json(parser.parse_args().years)
-
-    #If there's no option for the output user years.json
+    
     if not parser.parse_args().output:
-        print 'year.json'
-
+        generate_json(parser.parse_args().years)
+    else
+        generate_json(parser.parse_args().years, parser.parse_args().output)
+        
 if __name__ == '__main__':
     main()
