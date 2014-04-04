@@ -64,10 +64,9 @@ def special_days(year):
 
 def generate_json(years, output="years.json"):
     """ Generates the JSON for the specified years """
-    for year in years:
-        special = special_days(year)
-        with open(output, 'w') as outfile:
-            json.dump(DAYS + special, outfile)
+    days = [{str(year):DAYS + special_days(year) for year in years}]
+    with open(output, 'w') as outfile:
+        json.dump(days[0], outfile)
 
 def main():
     """ Parse the arguments and generate the json """
