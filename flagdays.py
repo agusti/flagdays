@@ -8,10 +8,20 @@ from datetime import datetime
 """
 
 #Days according to Wikipedia http://en.wikipedia.org/wiki/Flag_days_in_Finland
-DAYS = {'Kalevala day' : '28/02', 'Finnish Defence Forces day' : '04/06', 'Independence day' : '06/12', 'Runerberg day' : '05/02',
-        'Equality day' : '19/03', '09/04' : 'Finnish language day', 'National War Veterans\' day' : '27/04' , 'Europe day' : '09/05',
-        'Finnish identity day' : '12/05', 'Eino Leino day' : '06/07', 'Finnish Literature day' : '10/10', 'United Nations day' : '24/10',
-        'Swedish identity day' : '06/11', 'Finnish music day' : '08/12'}
+DAYS = [{'description' : 'Kalevala day', 'date' : '28/02'},
+        {'description' : 'Finnish Defence Forces day', 'date' : '04/06'}, 
+        {'description' : 'Independence day', 'date' : '06/12'}, 
+        {'description' : 'Runerberg day', 'date' : '05/02'},
+        {'description' : 'Equality day', 'date' : '19/03'}, 
+        {'description' : 'Finnish language day', 'date' : '09/04'}, 
+        {'description' : 'National War Veterans\' day', 'date' : '27/04'}, 
+        {'description' : 'Europe day', 'date' : '09/05'},
+        {'description' : 'Finnish identity day', 'date' : '12/05'}, 
+        {'description' : 'Eino Leino day', 'date' : '06/07'}, 
+        {'description' : 'Finnish Literature day', 'date' : '10/10'}, 
+        {'description' : 'United Nations day', 'date' : '24/10'},
+        {'description' : 'Swedish identity day', 'date' : '06/11'}, 
+        {'description' : 'Finnish music day', 'date' : '08/12'}]
 
 def special_days(year):
     """ Generate the days that are dynamic """
@@ -46,15 +56,18 @@ def special_days(year):
         father_day = str(second_week[calendar.SUNDAY]) + '/11'
     else:
         father_day = str(third_week[calendar.SUNDAY]) + '/11'
-    return {'Mother\'s day' : mother_day, 'Memorial\'s day' : memorial_day, 'Midsummer day' : midsummer_day, 'Father\'s day' : father_day}
+    #Return the special days
+    return [{'description' : 'Mother\'s day', 'date' : mother_day},
+            {'desctiption' : 'Memorial\'s day', 'date' : memorial_day},
+            {'description' : 'Midsummer day', 'date' : midsummer_day},
+            {'description' : 'Father\'s day', 'date' : father_day}]
 
 def generate_json(years, output="years.json"):
     """ Generates the JSON for the specified years """
     for year in years:
         special = special_days(year)
-        DAYS.update(special)
         with open(output, 'w') as outfile:
-            json.dump(DAYS, outfile)
+            json.dump(DAYS + special, outfile)
 
 def main():
     """ Parse the arguments and generate the json """
@@ -64,7 +77,7 @@ def main():
     
     if not parser.parse_args().output:
         generate_json(parser.parse_args().years)
-    else
+    else:
         generate_json(parser.parse_args().years, parser.parse_args().output)
         
 if __name__ == '__main__':
