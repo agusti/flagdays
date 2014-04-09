@@ -1,27 +1,35 @@
 import calendar
 import argparse
 import json
-from datetime import datetime
+import datetime
+import time
+import copy
 
 """
 @author: Agusti Pellicer
 """
 
 #Days according to Wikipedia http://en.wikipedia.org/wiki/Flag_days_in_Finland
-DAYS = [{'description' : 'Kalevala day', 'date' : '28/02'},
-        {'description' : 'Finnish Defence Forces day', 'date' : '04/06'}, 
-        {'description' : 'Independence day', 'date' : '06/12'}, 
-        {'description' : 'Runerberg day', 'date' : '05/02'},
-        {'description' : 'Equality day', 'date' : '19/03'}, 
-        {'description' : 'Finnish language day', 'date' : '09/04'}, 
-        {'description' : 'National War Veterans\' day', 'date' : '27/04'}, 
-        {'description' : 'Europe day', 'date' : '09/05'},
-        {'description' : 'Finnish identity day', 'date' : '12/05'}, 
-        {'description' : 'Eino Leino day', 'date' : '06/07'}, 
-        {'description' : 'Finnish Literature day', 'date' : '10/10'}, 
-        {'description' : 'United Nations day', 'date' : '24/10'},
-        {'description' : 'Swedish identity day', 'date' : '06/11'}, 
-        {'description' : 'Finnish music day', 'date' : '08/12'}]
+DAYS = [{'description' : 'Day of Kalevala', 'date' : '28/02', 'link': 'http://en.wikipedia.org/wiki/Kalevala'},
+        {'description' : 'Day of the Finnish Defence Forces', 'date' : '04/06', 'link':'http://en.wikipedia.org/wiki/Finnish_Defence_Forces'}, 
+        {'description' : 'Independence Day', 'date' : '06/12' , 'link' : 'http://en.wikipedia.org/wiki/Independence_Day_of_Finland'}, 
+        {'description' : 'Birthday of the National poet Johan Ludvig Runeberg', 'date' : '05/02', 'link':'http://en.wikipedia.org/wiki/Johan_Ludvig_Runeberg'},
+        {'description' : 'Day of Equality', 'date' : '19/03', 'link' : 'http://en.wikipedia.org/wiki/Minna_Canth'}, 
+        {'description' : 'Day of the Finnish language', 'date' : '09/04', 'link' : 'http://en.wikipedia.org/wiki/Finnish_language'}, 
+        {'description' : 'National War Veterans\' Day', 'date' : '27/04', 'link' : ''},
+        {'description' : 'Vappu, the Day of Finnish Labour' , 'date' : '01/05', 'link' : 'http://en.wikipedia.org/wiki/Labour_Day'},
+        {'description' : 'Europe Day', 'date' : '09/05', 'link':'http://en.wikipedia.org/wiki/Europe_Day'},
+        {'description' : 'Finnish identity Day', 'date' : '12/05', 'link' : 'http://en.wikipedia.org/wiki/Johan_Vilhelm_Snellman'}, 
+        {'description' : 'Eino Leino Day', 'date' : '06/07', 'link' : 'http://en.wikipedia.org/wiki/Eino_Leino'}, 
+        {'description' : 'Day of Finnish literature', 'date' : '10/10', 'link' : 'http://en.wikipedia.org/wiki/Aleksis_Kivi'}, 
+        {'description' : 'Day of the United Nations', 'date' : '24/10', 'link': 'http://en.wikipedia.org/wiki/United_Nations'},
+        {'description' : 'Day of the Swedish Identity', 'date' : '06/11', 'link' : 'http://en.wikipedia.org/wiki/Finland-Swedish'}, 
+        {'description' : 'Day of Finnish music', 'date' : '08/12', 'link': 'http://en.wikipedia.org/wiki/Jean_Sibelius'}]
+
+def convert_date_to_js(str_date,year):
+    date_s = str_date.split('/')
+    d = datetime.date(year, int(date_s[1]), int(date_s[0]))
+    return int(time.mktime(d.timetuple())) * 1000
 
 def special_days(year):
     """ Generate the days that are dynamic """
@@ -57,16 +65,33 @@ def special_days(year):
     else:
         father_day = str(third_week[calendar.SUNDAY]) + '/11'
     #Return the special days
-    return [{'description' : 'Mother\'s day', 'date' : mother_day},
-            {'desctiption' : 'Memorial\'s day', 'date' : memorial_day},
-            {'description' : 'Midsummer day', 'date' : midsummer_day},
-            {'description' : 'Father\'s day', 'date' : father_day}]
+    return [{'description' : 'Mother\'s day', 'date' : mother_day, 'link': 'http://en.wikipedia.org/wiki/Mother%27s_Day'},
+            {'desctiption' : 'Memorial\'s day', 'date' : memorial_day, 'link' : ''},
+            {'description' : 'Midsummer day', 'date' : midsummer_day, 'link' : 'http://en.wikipedia.org/wiki/Midsummer'},
+            {'description' : 'Father\'s day', 'date' : father_day, 'link' : 'http://en.wikipedia.org/wiki/Father%27s_Day'}]
 
 def generate_json(years, output="years.json"):
     """ Generates the JSON for the specified years """
-    days = [{str(year):DAYS + special_days(year) for year in years}]
+
+    days = []
+    for year in years:
+        DAYS_copy = copy.deepcopy(DAYS)
+        for dictionary in DAYS_copy:
+            for key, value in dictionary.items():
+                if key == 'date':
+                    dictionary[key] = convert_date_to_js(value, year)
+        special = special_days(year)
+        special_copy = copy.deepcopy(special)
+        for dictionary in special_copy:
+            for key, value in dictionary.items():
+                if key == 'date':
+                    dictionary[key] = convert_date_to_js(value, year)
+        days.append(DAYS_copy+special_copy)
+    
     with open(output, 'w') as outfile:
-        json.dump(days[0], outfile)
+        json.dump(days, outfile)
+
+
 
 def main():
     """ Parse the arguments and generate the json """
