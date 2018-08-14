@@ -73,7 +73,7 @@ def special_days(year):
 def generate_json(years, output="years.json"):
     """ Generates the JSON for the specified years """
 
-    days = []
+    days = {}
     for year in years:
         DAYS_copy = copy.deepcopy(DAYS)
         for dictionary in DAYS_copy:
@@ -86,7 +86,7 @@ def generate_json(years, output="years.json"):
             for key, value in dictionary.items():
                 if key == 'date':
                     dictionary[key] = convert_date_to_js(value, year)
-        days.append(DAYS_copy+special_copy)
+        days[year] = DAYS_copy+special_copy
     
     with open(output, 'w') as outfile:
         json.dump(days, outfile)
